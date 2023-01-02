@@ -440,6 +440,12 @@ def prediction2YODA(fvals, Peval, fout="predictions.yoda", ferrs=None, wfile=Non
         rd = json.load(f)
         xmin = np.array(rd["__xmin"])
         xmax = np.array(rd["__xmax"])
+       
+        ids_nicesort = vals._binids
+        ids_likefile = [x for x in rd.keys() if not x.startswith("__")]
+        likefile2nicesort = [ids_likefile.index(x) for x in ids_nicesort]
+        xmin = xmin[likefile2nicesort]
+        xmax = xmax[likefile2nicesort]
 
     DX = (xmax-xmin)*0.5
     X  = xmin + DX

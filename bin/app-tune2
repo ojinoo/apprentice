@@ -55,9 +55,10 @@ def mkPlotsCorrelation(TO, x0, prefix=""):
     pylab.clf()
     bb = pylab.imshow(A, vmin=-1, vmax=1, cmap="RdBu")
     locs, labels = pylab.yticks()
-    pylab.yticks([i for i in range(nd)], TO.pnames, rotation=00)
+    pnames = np.array(TO.pnames)[TO._freeIdx]
+    pylab.yticks([i for i in range(nd)], pnames, rotation=00)
     locs, labels = pylab.xticks()
-    pylab.xticks([i for i in range(nd)], TO.pnames, rotation=90)
+    pylab.xticks([i for i in range(nd)], pnames, rotation=90)
     cbar = pylab.colorbar(bb, extend='both')
 
     pylab.tight_layout()

@@ -380,6 +380,7 @@ class TuningObjective2(object):
         self._E = E[good]
         self._Y = Y[good]
         self._W2 = np.array([w * w for w in np.array(weights[nonzero])[good]], dtype=np.float64)
+        self._W = np.array(np.array(weights[nonzero])[good], dtype=np.float64)
         self._hnames = np.array([b.split("#")[0]  for b in self._binids])
         # Add in error approximations
         if f_errors is not None:
@@ -809,6 +810,10 @@ class TuningObjective2(object):
 
     @property
     def ndf(self): return len(self) - self.dim - len(self._fixIdx[0])
+    @property
+    def sumW2(self): return np.sum(self._W2)
+    @property
+    def sumW(self): return np.sum(self._W)
 
 
     def __len__(self): return len(self._AS)

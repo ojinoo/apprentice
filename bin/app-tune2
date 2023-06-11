@@ -110,10 +110,16 @@ if opts.DEBUG: print(res)
 
 chi2 = GOF.objective(res.x, unbiased=True)
 ndf = GOF.ndf
+sumW2 = GOF.sumW2
+sumW = GOF.sumW
+
+first_param_error = np.sqrt(2*np.linalg.inv(GOF.hessian(res.x))[0,0] * sumW2**2 / sumW**2)
 
 meta  = "# Objective value at best fit point: %.2f (%.2f without weights)\n"%(res.fun, chi2)
 meta += "# Degrees of freedom: {}\n".format(ndf)
 meta += "# phi2/ndf: %.3f\n"%(chi2/ndf)
+meta += "# fun/sumW2: %.3f\n"%(res.fun/sumW2)
+meta += "# First param error: %.6f\n"%(first_param_error)
 meta += "# Minimisation took {} seconds\n".format(t1-t0)
 meta += "# Command line: {}\n".format(" ".join(sys.argv))
 meta += "# Best fit point:"

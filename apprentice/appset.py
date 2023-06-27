@@ -765,9 +765,13 @@ class TuningObjective2(object):
         isoutside = isbelow + isabove
 
         isfixed = [i in self._fixIdx[0] for i in range(self.dim)]
+        
+        sumW2 = self.sumW2
+        sumW = self.sumW
+        perror_iter = iter(np.sqrt(2 * np.diagonal(np.linalg.inv(self.hessian(x_))) * sumW2**2 / sumW**2))
 
         s= ""
-        s+= ("#\n#{:<{slen}}\t{:<{plen}} #    COMMENT    [ {:<{dnlen}}  ...  {:<{uplen}} ]\n#\n".format(" PNAME", " PVALUE", " PLOW", " PHIGH", slen=slen, plen=plen, uplen=uplen, dnlen=dnlen))
+        s+= ("#\n#{:<{slen}}\t{:<{plen}} #    COMMENT    [ {:<{dnlen}}  ...  {:<{uplen}} ]    ERROR\n#\n".format(" PNAME", " PVALUE", " PLOW", " PHIGH", slen=slen, plen=plen, uplen=uplen, dnlen=dnlen))
         for pn, val, bdn, bup, isf, isb, iso in zip(self.pnames, x_aligned, b_dn, b_up, isfixed, isbound, isoutside):
 
             if isb and isf:
@@ -782,8 +786,13 @@ class TuningObjective2(object):
                 comment = "FIX & OUTSIDE"
             else:
                 comment = ""
+                
+            if isf:
+                perror = 0.0
+            else:
+                perror = next(perror_iter)
 
-            s+= ("{:<{slen}}\t{:<{plen}} # {:<13} [ {:<{dnlen}}  ...  {:<{uplen}} ]\n".format(pn, val, comment, bdn, bup, slen=slen, plen=plen, uplen=uplen, dnlen=dnlen))
+            s+= ("{:<{slen}}\t{:<{plen}} # {:<13} [ {:<{dnlen}}  ...  {:<{uplen}} ]    {:<}\n".format(pn, val, comment, bdn, bup, perror, slen=slen, plen=plen, uplen=uplen, dnlen=dnlen))
         return s
 
     def lineScan(self, x0, dim, npoints=100, bounds=None):

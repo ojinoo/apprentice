@@ -161,7 +161,19 @@ def readInputDataYODA(dirnames, parFileName="params.dat", wfile=None, storeAsH5=
         xmax = app.tools.chunkIt(xmax, size)
         binids = app.tools.chunkIt(BNAMES, size)
     rankIdx = comm.scatter(rankIdx, root=0)
-    data = comm.scatter(data, root=0)
+    if len(indirs) < 5000:
+        data = comm.scatter(data, root=0)
+    else:
+        if comm.size == 0:
+            (data,) = data
+        elif comm.rank == 0:
+            for i, attr in enumerate(data):
+                if i == 0:
+                    data = attr
+                else:
+                    comm.send(attr, dest=i)
+        else:
+            data = comm.recv(source=0)
     xmin = comm.scatter(xmin, root=0)
     xmax = comm.scatter(xmax, root=0)
     binids = comm.scatter(binids, root=0)

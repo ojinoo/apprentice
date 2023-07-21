@@ -1123,6 +1123,28 @@ def generate_data_from_RA(approximationfile, experimentaldatafile, p0, bbdict, r
 
     return data
 
+def extract_tune_results(name, file):
+    """
+    Returns tune results as nested dict
+    """
+    results = {}
+    with open (file, 'r') as f:
+        text = f.read()
+    results['name'] = name
+    results['objective_value'] = float(re.findall(r'Objective value at best fit point: (\d+.\d+)', text)[0])
+    results['ndf'] = int(re.findall(r'Degrees of freedom: (-?\d+)', text)[0])
+    results['phi2_ndf'] = float(re.findall(r'phi2/ndf: (-?\d+.\d+|inf)', text)[0])
+    results['fun_sumW2'] = float(re.findall(r'fun/sumW2: (-?\d+.\d+|inf)', text)[0])
+    params_match = re.findall(r'\n(\w+)\s+(-?\d+\.\d+)\s+#\s+(\w+)*\s+\[\s+(-?\d+\.\d+)\s+...\s+(-?\d+\.\d+)\s+]\s+(-?\d+\.\d+)', text)
+    results['p'] = {}
+    for param in params_match:
+        results['p'][param[0]] = {
+            'val': float(param[1]),
+            'comment': param[2],
+            'low': float(param[3]),
+            'high': float(param[4]),
+            'err': float(param[5])}
+    return results
 
 if __name__ == "__main__":
     import os, sys
